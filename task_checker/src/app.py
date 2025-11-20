@@ -3,6 +3,7 @@ import asyncio
 from fastapi import FastAPI
 import uvicorn
 
+from auth import add_jwt_auth_middleware
 from routers import add_routers
 from exceptions import init_exception_handlers
 from config import app_settings
@@ -11,6 +12,7 @@ from config import app_settings
 async def create_app():
     app = FastAPI(title="Task Checker", root_path="/api")
 
+    add_jwt_auth_middleware(app)
     init_exception_handlers(app)
     add_routers(app)
 
