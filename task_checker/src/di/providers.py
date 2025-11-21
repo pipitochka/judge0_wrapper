@@ -1,0 +1,14 @@
+from dishka import Provider, Scope, provide
+
+from config import app_settings
+from services import Judge0Service
+
+
+class AppProvider(Provider):
+    @provide(scope=Scope.APP)
+    def provide_judge0_service(self) -> Judge0Service:
+        return Judge0Service(
+            f"http://{app_settings.judge0.judge0_host}/{app_settings.judge0.judge0_port}",
+            header=app_settings.judge0.judge0_authn_header,
+            token=app_settings.judge0.judge0_authn_token
+        )
