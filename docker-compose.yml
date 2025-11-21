@@ -1,0 +1,76 @@
+x-logging:
+  &default-logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 100M
+
+services:
+  # Judge0 Services
+  # Note: Judge0 requires privileged mode for secure code execution sandboxing with isolate
+  judge0-server:
+    image: judge0/judge0:latest
+    volumes:
+      - ./judge0/judge0.conf:/judge0.conf:ro
+    ports:
+      - "2358:2358"
+    privileged: true
+    env_file: .env
+    environment:
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=db
+    depends_on:
+      - db
+      - redis
+    <<: *default-logging
+    restart: always
+
+  judge0-worker:
+    image: judge0/judge0:latest
+    command: ["./scripts/workers"]
+    volumes:
+      - ./judge0/judge0.conf:/judge0.conf:ro
+    privileged: true
+    env_file: .env
+    environment:
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=db
+    depends_on:
+      - db
+      - redis
+    <<: *default-logging
+    restart: always
+
+  db:
+    image: postgres:16.2
+    env_file: .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    <<: *default-logging
+    restart: always
+
+  redis:
+    image: redis:7.2.4
+    command: [
+      "bash", "-c",
+      'docker-entrypoint.sh --appendonly no --requirepass "$$REDIS_PASSWORD"'
+    ]
+    env_file: .env
+    <<: *default-logging
+    restart: always
+
+  # Task Checker Service (FastAPI)
+  task-checker:
+    build:
+      context: ./task_checker
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - judge0-server
+    <<: *default-logging
+    restart: always
+
+volumes:
+  postgres-data:
