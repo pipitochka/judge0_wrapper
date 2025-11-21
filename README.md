@@ -61,8 +61,8 @@ Configuration is managed through environment variables in the `.env` file:
 ### Task Checker Configuration
 - `UVICORN_HOST`, `UVICORN_PORT`: Server host and port
 - `AUTH_JWT_SECRET`: Secret key for JWT token generation
-- `JUDGE0_JUDGE0_AUTHN_TOKEN`: Token for authenticating with Judge0
-- `JUDGE0_JUDGE0_HOST`: Judge0 service hostname (default: judge0-server)
+- `JUDGE0_AUTHN_TOKEN`: Token for authenticating with Judge0
+- `JUDGE0_HOST`: Judge0 service hostname (default: judge0-server)
 
 ## Development
 
