@@ -21,10 +21,10 @@ class AuthSettings(BaseSettings):
 class Judge0Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix='JUDGE0_')
     
-    judge0_authn_header: str = "X-Auth-Token"
-    judge0_authn_token: str = "change_me_in_production"
-    judge0_host: str = "judge0-server"
-    judge0_port: int = 2358
+    authn_header: str = "X-Auth-Token"
+    authn_token: str = "change_me_in_production"
+    host: str = "localhost"
+    port: int = 2358
 
 
 class AppSettings(BaseSettings):

@@ -29,7 +29,7 @@ cp .env.example .env
 
 4. Start all services:
 ```bash
-docker-compose up -d
+./run.sh
 ```
 
 5. Wait for services to initialize (first run may take a few minutes to download images and initialize database).
