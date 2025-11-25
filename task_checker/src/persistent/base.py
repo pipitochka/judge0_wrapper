@@ -1,7 +1,7 @@
 from typing import Annotated
 from datetime import datetime
 
-from sqlalchemy import func, inspect, BIGINT
+from sqlalchemy import func, inspect, Integer
 from sqlalchemy.orm import Mapped, sessionmaker, DeclarativeBase, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs, create_async_engine
 
@@ -21,7 +21,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 class WithId:
     __abstract__ = True
 
-    id: Mapped[int] = mapped_column(BIGINT, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
 
 class WithTimestamp:

@@ -1,2 +1,2 @@
 from .submission import SubmissionRepository
-from .tasks import TaskRepository
+from .tasks import TaskRepository, TestCaseRepository

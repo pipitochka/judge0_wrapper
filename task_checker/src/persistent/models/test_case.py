@@ -1,4 +1,4 @@
-from sqlalchemy import BIGINT, ForeignKey
+from sqlalchemy import Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from persistent.base import WithId, Base
@@ -16,5 +16,5 @@ class TestCase(Base, WithId):
 
     is_hidden: Mapped[bool] = mapped_column(default=True)
 
-    task_id: Mapped[int] = mapped_column(BIGINT, ForeignKey("tasks.id", ondelete="CASCADE"))
+    task_id: Mapped[int] = mapped_column(Integer, ForeignKey("tasks.id", ondelete="CASCADE"))
     task: Mapped[Task] = relationship(back_populates="test_cases")
