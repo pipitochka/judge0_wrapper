@@ -7,7 +7,7 @@ from .tasks import router as tasks_router
 routers = [
     info_router,
     submissions_router,
-    # tasks_router  # TODO: когда появятся задачи, появится и роутер
+    tasks_router
 ]
 
 

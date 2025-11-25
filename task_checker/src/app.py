@@ -25,7 +25,7 @@ async def create_app():
     app = FastAPI(title="Task Checker", root_path="/api", lifespan=lifespan)
 
     setup_di(app)
-    add_jwt_auth_middleware(app)
+    # add_jwt_auth_middleware(app)
     init_exception_handlers(app)
     add_routers(app)
 
