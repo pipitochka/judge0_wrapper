@@ -1,7 +1,10 @@
+from typing import AsyncIterable
+
 from dishka import Provider, Scope, provide
 
 from config import app_settings
 from persistent import Database
+from repositories import TaskRepository, TestCaseRepository
 from services import Judge0Service
 
 
@@ -21,3 +24,13 @@ class AppProvider(Provider):
     @provide(scope=Scope.APP)
     def provide_db(self) -> Database:
         return self._db
+
+    @provide(scope=Scope.REQUEST)
+    async def provide_task_repository(self, db: Database) -> AsyncIterable[TaskRepository]:
+        async with db.session() as session:
+            yield TaskRepository(session)
+
+    @provide(scope=Scope.REQUEST)
+    async def provide_testcase_repository(self, db: Database) -> AsyncIterable[TestCaseRepository]:
+        async with db.session() as session:
+            yield TestCaseRepository(session)
