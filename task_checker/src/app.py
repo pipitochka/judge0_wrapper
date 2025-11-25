@@ -6,6 +6,7 @@ import uvicorn
 
 from auth import add_jwt_auth_middleware
 from di import setup_di
+from persistent import Database
 from routers import add_routers
 from exceptions import init_exception_handlers
 from config import app_settings
@@ -13,6 +14,9 @@ from config import app_settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    container = app.state.dishka_container
+    db: Database = await container.get(Database)
+    await db.check_and_create_tables()
     yield
     await app.state.dishka_container.close()
 
