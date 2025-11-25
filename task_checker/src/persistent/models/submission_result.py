@@ -19,8 +19,14 @@ class SubmissionResult(Base, WithId, WithTimestamp):
 
     submission_id: Mapped[int] = mapped_column(BIGINT, ForeignKey("submissions.id"))
     test_case_id: Mapped[int] = mapped_column(BIGINT, ForeignKey("test_cases.id"))
-    stdout: Mapped[str]
-    status: Mapped[SubmissionStatus] = mapped_column(default=SubmissionStatus.Passed)
+
+    used_time: Mapped[float] = mapped_column(default=0)
+    used_memory: Mapped[int] = mapped_column(default=0)
+
+    stdout: Mapped[str | None]
+    stderr: Mapped[str | None]
+
+    status: Mapped[SubmissionStatus] = mapped_column(default=SubmissionStatus.Pending)
 
     submission: Mapped[Submission] = relationship(back_populates="results")
     test_case: Mapped[TestCase] = relationship()
