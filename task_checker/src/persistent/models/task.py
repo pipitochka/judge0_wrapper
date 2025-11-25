@@ -21,4 +21,8 @@ class Task(Base, WithId):
     content: Mapped[str | None]
     type: Mapped[TestCaseType]
 
-    test_cases: Mapped[list["TestCase"]] = relationship()
+    test_cases: Mapped[list["TestCase"]] = relationship(
+        back_populates="task",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )

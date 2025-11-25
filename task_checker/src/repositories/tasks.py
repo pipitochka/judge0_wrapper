@@ -135,7 +135,7 @@ class TestCaseRepository(BaseRepository):
     async def get_visible_testcases(self, task_id: int) -> list[TestCaseDto]:
         q = select(TestCase).where(
             TestCase.task_id == task_id,
-            TestCase.is_hidden == False
+            TestCase.is_hidden.is_(False)
         )
         result = await self.session.execute(q)
         testcases = result.scalars().all()
