@@ -31,9 +31,12 @@ async def get_task_visible_cases(
 async def create_test_case(
     task_id: int,
     data: CreateTestCaseDto,
-    testcase_repo: FromDishka[TestCaseRepository]
+    testcase_repo: FromDishka[TestCaseRepository],
+    batch: bool = False
 ):
-    return await testcase_repo.create_testcase(task_id, data)
+    if not batch:
+        return await testcase_repo.create_testcase(task_id, data)
+    return await testcase_repo.create_testcases()
 
 
 @router.put("/{task_id}/testcases/{testcase_id}", response_model=TestCaseDto)

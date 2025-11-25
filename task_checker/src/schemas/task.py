@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from persistent.models import TestCaseType
+from persistent.models import TestCaseType, TestCase
 
 
 class TaskDto(BaseModel):
@@ -32,6 +32,18 @@ class TestCaseDto(BaseModel):
 
     is_hidden: bool = True
     task_id: int
+
+    @classmethod
+    def from_sqlalchemy(cls, testcase: TestCase) -> "TestCaseDto":
+        return cls(
+            id=testcase.id,
+            stdin=testcase.stdin,
+            expected=testcase.expected,
+            time_limit=testcase.time_limit,
+            memory_limit=testcase.memory_limit,
+            is_hidden=testcase.is_hidden,
+            task_id=testcase.task_id
+        )
 
 
 class CreateTestCaseDto(BaseModel):
