@@ -20,6 +20,8 @@ class Database:
             await session.run_sync(Base.metadata.create_all)
 
     async def check_and_create_tables(self):
+        from .models import Submission, SubmissionResult, TestCase, Task
+
         async with self._engine.connect() as conn:
             tables = await conn.run_sync(
                 lambda sync_conn: inspect(sync_conn).get_table_names()
