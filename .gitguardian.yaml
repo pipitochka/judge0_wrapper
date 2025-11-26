@@ -1,0 +1,7 @@
+secret:
+  ignored-paths:
+    - "**/.env.example"
+    - "**/README.md"
+  ignored-matches:
+    - name: "SciBox Example Key"
+      match: "sk-Zx6Up1AqQOTivM6w-ZnlyQ"
