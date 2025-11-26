@@ -99,6 +99,44 @@ services:
     <<: *default-logging
     restart: always
 
+  gateway-db:
+    image: postgres:16.2
+    env_file: .env
+    environment:
+      - POSTGRES_DB=${GATEWAY_DB_NAME:-gateway_db}
+      - POSTGRES_USER=${GATEWAY_DB_USER:-gateway_user}
+      - POSTGRES_PASSWORD=${GATEWAY_DB_PASSWORD:-gateway_password}
+    volumes:
+      - gateway-postgres-data:/var/lib/postgresql/data/
+      - ./gateway/init.sql:/docker-entrypoint-initdb.d/init.sql:ro  # Опционально
+    networks:
+      - judge0-network
+    <<: *default-logging
+    restart: always
+
+  gateway:
+    build:
+      context: ./gateway  # Папка с вашим Spring Boot приложением
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"  # Spring Boot по умолчанию на 8080
+    env_file: .env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://gateway-db:5432/${GATEWAY_DB_NAME:-gateway_db}
+      - SPRING_DATASOURCE_USERNAME=${GATEWAY_DB_USER:-gateway_user}
+      - SPRING_DATASOURCE_PASSWORD=${GATEWAY_DB_PASSWORD:-gateway_password}
+      - JUDGE0_URL=http://judge0-server:2358
+      - SCIBOX_URL=https://llm.t1v.scibox.tech/v1
+      - SCIBOX_API_KEY=${SCIBOX_API_KEY}
+    depends_on:
+      - gateway-db
+      - judge0-server
+    networks:
+      - judge0-network
+    <<: *default-logging
+    restart: always
+
 volumes:
   postgres-data:
   task-checker-postgres-data:
+  gateway-postgres-data:
