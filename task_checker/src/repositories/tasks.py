@@ -1,13 +1,25 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from persistent.models import Task
 from schemas.task import (
     TaskDto, CreateTaskDto, UpdateTaskDto,
 )
+# if TYPE_CHECKING:
+from .test_case import TestCaseRepository
 from .base import BaseRepository
 
 
 class TaskRepository(BaseRepository):
+    def __init__(self,
+            session: AsyncSession,
+            testcases_repo: TestCaseRepository
+    ):
+        self.tc_repo = testcases_repo
+        super().__init__(session)
+
     async def create_task(self, data: CreateTaskDto) -> TaskDto:
         task = Task(
             title=data.title,
@@ -32,11 +44,14 @@ class TaskRepository(BaseRepository):
         if task is None:
             return None
 
+        example_testcases = await self.tc_repo.get_testcases(task.id, only_open=True)
+
         return TaskDto(
             id=task.id,
             title=task.title,
             content=task.content,
-            type=task.type
+            type=task.type,
+            testcases=example_testcases
         )
 
     async def update_task(self, task_id: int, data: UpdateTaskDto) -> TaskDto | None:

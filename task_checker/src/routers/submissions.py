@@ -3,6 +3,7 @@ from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from persistent.models import TaskType
 from repositories import SubmissionRepository, TestCaseRepository, TaskRepository
+from schemas.submission import CreateRunTestDtoSchema
 from services import Judge0Service
 from schemas import CreateSubmissionSchema, Judge0SubmissionResultDto
 from services.submission import SubmissionService
@@ -19,15 +20,31 @@ async def get_submission(submission_id: int, show_hidden_test: bool, repo: FromD
 async def create_submission(
         submission: CreateSubmissionSchema,
         submission_service: FromDishka[SubmissionService],
-        test: bool = False,
-        open_tests: bool = False
+        # test: bool = False,
+        # open_tests: bool = False
 ):
-    if test and open_tests:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": "Submission cannot be run wit and run on `open tests` at the same time!"}
-        )
-    return await submission_service.submit_solution(submission, test, open_tests)
+    # if test and open_tests:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail={"message": "Submission cannot be run wit and run on `open tests` at the same time!"}
+    #     )
+    return await submission_service.submit_solution(submission, False, False)
+
+
+@router.post("/run_examples")
+async def create_test_submission(
+        submission: CreateSubmissionSchema,
+        submission_service: FromDishka[SubmissionService]
+):
+    return await submission_service.submit_solution(submission, False, True)
+
+
+@router.post("/test")
+async def create_test_submission(
+        submission: CreateRunTestDtoSchema,
+        submission_service: FromDishka[SubmissionService]
+):
+    return await submission_service.submit_solution(submission, True, False)
 
 
 @router.put("/callback")

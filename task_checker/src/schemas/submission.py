@@ -8,9 +8,9 @@ class CreateSubmissionSchema(BaseModel):
     answer: str = Field(..., min_length=1, max_length=100000, description="Source code or answer")
     language_id: str
 
-    stdin: str | None = Field(default=None, max_length=10000, description="stdin")
-    compiler_options: str | None = Field(default=None, max_length=512, description="Compiler options")
-    command_line_arguments: str | None = Field(default=None, max_length=512, description="CMD args")
+    # stdin: str | None = Field(default=None, max_length=10000, description="stdin")
+    # compiler_options: str | None = Field(default=None, max_length=512, description="Compiler options")
+    # command_line_arguments: str | None = Field(default=None, max_length=512, description="CMD args")
 
     @field_validator("answer")
     def validate_source_code(cls, v):
@@ -18,17 +18,28 @@ class CreateSubmissionSchema(BaseModel):
             raise ValueError("Source code cannot be empty")
         return v
 
-    @field_validator("compiler_options")
-    def validate_compiler_options(cls, v):
-        if v and len(v) > 512:
-            raise ValueError("Compiler options too long")
-        return v
+    # @field_validator("compiler_options")
+    # def validate_compiler_options(cls, v):
+    #     if v and len(v) > 512:
+    #         raise ValueError("Compiler options too long")
+    #     return v
+    #
+    # @field_validator("command_line_arguments")
+    # def validate_command_line_args(cls, v):
+    #     if v and len(v) > 512:
+    #         raise ValueError("Command line arguments too long")
+    #     return v
 
-    @field_validator("command_line_arguments")
-    def validate_command_line_args(cls, v):
-        if v and len(v) > 512:
-            raise ValueError("Command line arguments too long")
-        return v
+
+class CreateRunTestDtoSchema(BaseModel):
+    task_id: int
+    answer: str = Field(..., min_length=1, max_length=100000, description="Source code or answer")
+    language_id: str
+    stdin: str
+
+
+class SubmissionIdSchema(BaseModel):
+    id: int
 
 
 class SubmissionJudge0Schema(BaseModel):

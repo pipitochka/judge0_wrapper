@@ -8,6 +8,7 @@ class TaskDto(BaseModel):
     title: str
     content: str | None
     type: TaskType
+    testcases: list["TestCaseDto"] = []
 
 
 class CreateTaskDto(BaseModel):

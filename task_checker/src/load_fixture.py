@@ -16,6 +16,7 @@ root_dir = Path(__file__).parent
 load_dotenv(root_dir.parent.parent / ".env")
 
 debug = os.environ.get("TASK_CHECKER_DEBUG", "false").lower() in ("1", "t", "true", "y")
+
 db_host = os.environ.get("DB_HOST", "task-checker-db")
 db_port = os.environ.get("DB_PORT", "5432")
 db_user = os.environ.get("DB_USER", "task_checker")

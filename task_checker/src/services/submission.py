@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from persistent.models import TaskType
 from repositories import TaskRepository, TestCaseRepository, SubmissionRepository
 from schemas import CreateSubmissionSchema, SubmissionGeneralSchema
+from schemas.submission import SubmissionIdSchema, CreateRunTestDtoSchema
 from services import Judge0Service
 
 
@@ -19,16 +20,16 @@ class SubmissionService:
         self.submission_repo = submission_repo
         self.judge_service = judge0_service
 
-    async def submit_solution(self, submission: CreateSubmissionSchema, test: bool, open_tests: bool) -> SubmissionGeneralSchema:
+    async def submit_solution(self, submission: CreateSubmissionSchema, test: bool, open_tests: bool) -> SubmissionIdSchema:
         task = await self.task_repo.get_task(submission.task_id)
         if test and (not task or task.type == TaskType.Algorithm):  # тестовый прогон доступен только для алгозадач
-            return await self.judge_service.create_test_submission(submission)
+            return SubmissionIdSchema(id=(await self.judge_service.create_test_submission(submission)).id)
 
         elif not task:
             raise HTTPException(status_code=404, detail="Task with such id not found")
 
         elif task.type == TaskType.Algorithm:
-            return await self.judge_service.create_submission(submission, open_tests)
+            return SubmissionIdSchema(id=(await self.judge_service.create_submission(submission, open_tests)).id)
         elif task.type == TaskType.Math:
             testcases = await self.tc_repo.get_testcases(task.id, False)
             submission_model = await self.submission_repo.create_submission("0", task.id, submission.answer)
@@ -42,9 +43,12 @@ class SubmissionService:
                 testcase.id,
                 submission.answer == testcase.expected  # TODO: возможно нужно какое-то более сложное сравнение
             )
-            return submission_model
+            return submission_model.id
 
         elif task.type == TaskType.AI_validated:
             raise HTTPException(status_code=418, detail="Sorry, we have not implemented this type of tasks yet")
         else:
             raise HTTPException(status_code=403, detail="Incorrect task type")
+
+    async def run_test(self, submission: CreateRunTestDtoSchema) -> SubmissionIdSchema:
+        return SubmissionIdSchema(id=(await self.judge_service.create_test_submission(submission)).id)

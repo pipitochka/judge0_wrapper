@@ -28,9 +28,9 @@ class AppProvider(Provider):
         return self._db
 
     @provide(scope=Scope.REQUEST)
-    async def provide_task_repository(self, db: Database) -> AsyncIterable[TaskRepository]:
+    async def provide_task_repository(self, db: Database, tc_repo: TestCaseRepository) -> AsyncIterable[TaskRepository]:
         async with db.session() as session:
-            yield TaskRepository(session)
+            yield TaskRepository(session, tc_repo)
 
     @provide(scope=Scope.REQUEST)
     async def provide_testcase_repository(self, db: Database) -> AsyncIterable[TestCaseRepository]:
