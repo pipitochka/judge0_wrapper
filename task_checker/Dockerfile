@@ -10,11 +10,15 @@ RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host pypi.pytho
 # Copy application code
 COPY src /app/src
 
+# Copy entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 # Set Python path to include src directory
 ENV PYTHONPATH=/app/src
 
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["python", "src/app.py"]
+# Run the entrypoint script
+CMD ["/app/entrypoint.sh"]

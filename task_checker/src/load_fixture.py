@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from sqlalchemy import select, func
 
 from persistent import Database
 import persistent.models as models
@@ -15,16 +16,23 @@ root_dir = Path(__file__).parent
 load_dotenv(root_dir.parent.parent / ".env")
 
 debug = os.environ.get("TASK_CHECKER_DEBUG", "false").lower() in ("1", "t", "true", "y")
-# db_host = os.environ.get()
-# db_port = os.environ.get()
-# db_user = os.environ.get()
-# db_pwd = os.environ.get()
-db_name = os.environ.get("DB_NAME")
+db_host = os.environ.get("DB_HOST", "task-checker-db")
+db_port = os.environ.get("DB_PORT", "5432")
+db_user = os.environ.get("DB_USER", "task_checker")
+db_pwd = os.environ.get("DB_PASSWORD", "task_checker_password")
+db_name = os.environ.get("DB_NAME", "task_checker")
 
 if debug:
     db_url = f"sqlite+aiosqlite:///./{db_name}.db"
 else:
-    db_url = ""
+    db_url = f"postgresql+asyncpg://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}"
+
+
+async def check_fixtures_loaded(session) -> bool:
+    """Check if fixtures have already been loaded by counting tasks."""
+    result = await session.execute(select(func.count()).select_from(models.Task))
+    count = result.scalar()
+    return count > 0
 
 
 async def load_batch(path: Path, session):
@@ -63,9 +71,14 @@ async def main():
     await db.check_and_create_tables()
 
     async with db.session() as s:
+        # Check if fixtures are already loaded
+        if await check_fixtures_loaded(s):
+            print("Fixtures already loaded, skipping...")
+            return
+        
         await load_batch(root_dir / "fixtures" / "dump1.json", s)
         await load_batch(root_dir / "fixtures" / "dump2.json", s)
-        print(f"Fixtures loaded")
+        print("Fixtures loaded successfully")
 
 
 asyncio.run(main())

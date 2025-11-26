@@ -70,6 +70,20 @@ services:
     <<: *default-logging
     restart: always
 
+  task-checker-db:
+    image: postgres:16.2
+    env_file: .env
+    environment:
+      - POSTGRES_DB=${TASK_CHECKER_DB_NAME:-task_checker}
+      - POSTGRES_USER=${TASK_CHECKER_DB_USER:-task_checker}
+      - POSTGRES_PASSWORD=${TASK_CHECKER_DB_PASSWORD:-task_checker_password}
+    volumes:
+      - task-checker-postgres-data:/var/lib/postgresql/data/
+    networks:
+      - judge0-network
+    <<: *default-logging
+    restart: always
+
   task-checker:
     build:
       context: ./task_checker
@@ -79,6 +93,7 @@ services:
     env_file: .env
     depends_on:
       - judge0-server
+      - task-checker-db
     networks: # 2. Подключаем к сети
       - judge0-network
     <<: *default-logging
@@ -86,3 +101,4 @@ services:
 
 volumes:
   postgres-data:
+  task-checker-postgres-data:

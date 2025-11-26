@@ -30,11 +30,11 @@ class Judge0Settings(BaseSettings):
 class DatabaseSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="DB_")
 
-    host: str = "db_host"
+    host: str = "task-checker-db"
     port: int = 5432
-    name: str = "app"
-    user: str = "username"
-    password: str = "pwd"
+    name: str = "task_checker"
+    user: str = "task_checker"
+    password: str = "task_checker_password"
 
     def get_database_url(self, debug: bool) -> str:
         if debug:
