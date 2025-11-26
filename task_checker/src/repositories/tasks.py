@@ -28,8 +28,10 @@ class TaskRepository(BaseRepository):
         q = select(Task).where(Task.id == task_id)
         result = await self.session.execute(q)
         task = result.scalar_one_or_none()
+
         if task is None:
             return None
+
         return TaskDto(
             id=task.id,
             title=task.title,

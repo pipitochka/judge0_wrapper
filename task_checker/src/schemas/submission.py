@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 
+from persistent.models import Submission, SubmissionResult
+
 
 class CreateSubmissionSchema(BaseModel):
     task_id: int
@@ -29,17 +31,23 @@ class CreateSubmissionSchema(BaseModel):
         return v
 
 
-class SubmissionSchema(BaseModel):
+class SubmissionJudge0Schema(BaseModel):
     token: str
+
     stdout: str | None
     stderr: str | None
+
     message: str | None
     compile_output: str | None
+
     status: str | None
     accepted: bool
 
+    memory_used: str
+    time_used: str
+
     @classmethod
-    def from_json(cls, data):
+    def from_json(cls, data: dict) -> "SubmissionJudge0Schema":
         return cls(
             token=data["token"],
             stdout=data["stdout"],
@@ -47,5 +55,61 @@ class SubmissionSchema(BaseModel):
             message=data["message"],
             compile_output=data["compile_output"],
             status=data["status"]["description"],
-            accepted=data["status"]["description"] == "Accepted"
+            accepted=data["status"]["description"] == "Accepted",
+            memory_used=data["memory"],
+            time_used=data["time"]
+        )
+
+
+class TestCaseResultDto(BaseModel):
+    stdin: str | None
+    stdout: str | None
+    stderr: str | None
+    expected_answer: str | None
+
+    message: str | None
+    compile_output: str | None
+
+    status: str | None
+
+    used_memory: int
+    used_time: float
+
+    @classmethod
+    def from_sqlalchemy(
+            cls,
+            data: SubmissionResult,
+            stdin: str,
+            expected_answer: str
+    ) -> "TestCaseResultDto":
+        return cls(
+            stdin=stdin,
+            stdout=data.stdout,
+            stderr=data.stderr,
+            expected_answer=expected_answer,
+            message=data.message,
+            compile_output=data.compile_output,
+            status=data.status,
+            used_memory=data.used_memory,
+            used_time=data.used_time
+        )
+
+
+class SubmissionResultDto(BaseModel):
+    id: int
+    task_id: int
+    status: str
+
+    testcase_results: list[TestCaseResultDto] = []
+
+
+class SubmissionGeneralSchema(BaseModel):
+    id: int
+    task_id: int
+
+    @classmethod
+    def from_sqlalchemy(cls, data: Submission) -> "SubmissionGeneralSchema":
+        return cls(
+            id=data.id,
+            task_id=data.task_id
         )

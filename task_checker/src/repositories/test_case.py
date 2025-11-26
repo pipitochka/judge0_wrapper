@@ -59,8 +59,13 @@ class TestCaseRepository(BaseRepository):
 
         return TestCaseDto.from_sqlalchemy(testcase)
 
-    async def get_testcases(self, task_id: int) -> list[TestCaseDto]:
+    async def get_testcases(self, task_id: int, only_open: bool = False) -> list[TestCaseDto]:
         q = select(TestCase).where(TestCase.task_id == task_id)
+        if only_open:
+            q = q.where(
+                TestCase.is_hidden == False
+            )
+
         result = await self.session.execute(q)
         testcases = result.scalars().all()
         return [

@@ -22,7 +22,7 @@ class Judge0Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="JUDGE0_")
     
     authn_header: str = "X-Auth-Token"
-    authn_token: str = "change_me_in_production"
+    authn_token: str = "YourSecureJudge0Token123"
     host: str = "localhost"
     port: int = 2358
 
@@ -46,6 +46,8 @@ class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     debug: bool = True
+    task_checker_container_name: str = ""
+    task_checker_container_port: int = 8000
 
     uvicorn: UvicornSettings = UvicornSettings()
     auth: AuthSettings = AuthSettings()
@@ -54,6 +56,11 @@ class AppSettings(BaseSettings):
 
     def get_database_url(self) -> str:
         return self.database.get_database_url(self.debug)
+
+    def get_callback_url_for_judge0(self):
+        if not self.task_checker_container_name:
+            return f"http://host.docker.internal:{self.uvicorn.port}/submissions/callback"
+        return f"http://{self.task_checker_container_name}:{self.task_checker_container_port}/submissions/callback"
 
 
 app_settings = AppSettings()

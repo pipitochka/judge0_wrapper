@@ -27,16 +27,16 @@ async def get_task_visible_cases(
     return await testcase_repo.get_visible_testcases(task_id)
 
 
-@router.post("/{task_id}/testcases", response_model=TestCaseDto)
+@router.post("/{task_id}/testcases")
 async def create_test_case(
     task_id: int,
-    data: CreateTestCaseDto,
+    data: CreateTestCaseDto | list[CreateTestCaseDto],
     testcase_repo: FromDishka[TestCaseRepository],
     batch: bool = False
-):
+) -> TestCaseDto | list[TestCaseDto]:
     if not batch:
         return await testcase_repo.create_testcase(task_id, data)
-    return await testcase_repo.create_testcases()
+    return await testcase_repo.create_testcases(task_id, data)
 
 
 @router.put("/{task_id}/testcases/{testcase_id}", response_model=TestCaseDto)

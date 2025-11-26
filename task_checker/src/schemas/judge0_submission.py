@@ -1,9 +1,11 @@
 from pydantic import BaseModel, Field
 
-from schemas import CreateSubmissionSchema
+from config import app_settings
+from .submission import CreateSubmissionSchema
+from .task import TestCaseDto
 
 
-class Judge0Submission(BaseModel):
+class Judge0SubmissionSchema(BaseModel):
     source_code: str
     language_id: str
 
@@ -29,10 +31,45 @@ class Judge0Submission(BaseModel):
 
     @classmethod
     def from_submission_schema(cls, submission_schema: CreateSubmissionSchema):
-        return Judge0Submission(
+        return Judge0SubmissionSchema(
             source_code=submission_schema.source_code,
             language_id=submission_schema.language_id,
             stdin=submission_schema.stdin,
             compiler_options=submission_schema.compiler_options,
             command_line_arguments=submission_schema.command_line_arguments
         )
+
+    @classmethod
+    def from_testcase(cls, tc: TestCaseDto, submission_schema: CreateSubmissionSchema) -> "Judge0SubmissionSchema":
+        return Judge0SubmissionSchema(
+            source_code=submission_schema.source_code,
+            language_id=submission_schema.language_id,
+            stdin=tc.stdin,
+            compiler_options=submission_schema.compiler_options,
+            command_line_arguments=submission_schema.command_line_arguments,
+            cpu_time_limit=tc.time_limit or 2,
+            memory_limit=tc.memory_limit or 128000,
+            expected_output=tc.expected,
+            callback_url=app_settings.get_callback_url_for_judge0()
+        )
+
+
+class Judge0StatusDto(BaseModel):
+    id: int
+    description: str
+
+
+class Judge0SubmissionResultDto(BaseModel):
+    # представление ответа judge0
+    token: str
+
+    stdout: str | None
+    stderr: str | None
+
+    message: str | None
+    compile_output: str | None
+
+    memory: int | None
+    time: str | None
+
+    status: Judge0StatusDto
