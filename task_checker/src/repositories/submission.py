@@ -54,18 +54,24 @@ class SubmissionRepository(BaseRepository):
         model: SubmissionResult | None = (await self.session.execute(q)).scalar_one_or_none()  # если model = None, то это гг
 
         try:
-            stdout = base64.b64decode(submission_result.stdout).decode("utf-8")
+            stdout = base64.b64decode(submission_result.stdout or "").decode("utf-8")
+            stderr = base64.b64decode(submission_result.stderr or "").decode("utf-8")
+            compile_output = base64.b64decode(submission_result.compile_output or "").decode("utf-8")
+            message = base64.b64decode(submission_result.message or "").decode("utf-8")
         except Exception as exc:
-            logger.error(exc)
+            logger.exception(exc)
             stdout = submission_result.stdout
+            stderr = submission_result.stderr
+            compile_output = submission_result.compile_output
+            message = submission_result.message
 
         model.status = SubmissionStatus.from_string(submission_result.status.description)
         model.used_time = submission_result.time
         model.used_memory = submission_result.memory
         model.stdout = stdout
-        model.stderr = submission_result.stderr
-        model.compile_output = submission_result.compile_output
-        model.message = submission_result.message
+        model.stderr = stderr
+        model.compile_output = compile_output
+        model.message = message
 
         self.session.add(model)
         await self.session.commit()

@@ -1,7 +1,13 @@
+from logging import getLogger
+
+from fastapi import HTTPException, status
 import httpx
 
 from repositories import TaskRepository, TestCaseRepository, SubmissionRepository
 from schemas import SubmissionJudge0Schema, CreateSubmissionSchema, Judge0SubmissionSchema, SubmissionGeneralSchema
+
+
+logger = getLogger(__name__)
 
 
 class Judge0Service:
@@ -41,6 +47,10 @@ class Judge0Service:
         )
         submission = await self._sm_repo.create_submission("0", submission.task_id, submission.answer)
         tokens = resp.json()
+
+        if not tokens or not tokens[0].get("token"):
+            logger.error(f"Incorrect submission to judge0. Response: {tokens}. Request: {submissions}")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect request data!")
 
         await self._sm_repo.create_empty_submission_results(
             submission.id,
