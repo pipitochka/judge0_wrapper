@@ -32,7 +32,7 @@ class DatabaseSettings(BaseSettings):
 
     host: str = "db_host"
     port: int = 5432
-    name: str = "db"
+    name: str = "app"
     user: str = "username"
     password: str = "pwd"
 
@@ -45,7 +45,7 @@ class DatabaseSettings(BaseSettings):
 class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    debug: bool = True
+    task_checker_debug: bool = True
     task_checker_container_name: str = ""
     task_checker_container_port: int = 8000
 
@@ -55,7 +55,7 @@ class AppSettings(BaseSettings):
     database: DatabaseSettings = DatabaseSettings()
 
     def get_database_url(self) -> str:
-        return self.database.get_database_url(self.debug)
+        return self.database.get_database_url(self.task_checker_debug)
 
     def get_callback_url_for_judge0(self):
         if not self.task_checker_container_name:

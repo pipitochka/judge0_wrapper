@@ -11,8 +11,8 @@ class TestCase(Base, WithId):
     stdin: Mapped[str | None]
     expected: Mapped[str]
 
-    time_limit: Mapped[float | None]
-    memory_limit: Mapped[int | None]
+    time_limit: Mapped[float] = mapped_column(default=2)
+    memory_limit: Mapped[int] = mapped_column(default=32000)
 
     is_hidden: Mapped[bool] = mapped_column(default=True)
 

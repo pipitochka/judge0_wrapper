@@ -11,8 +11,8 @@ router = APIRouter(prefix="/submissions", tags=["submissions"], route_class=Dish
 
 
 @router.get("/{submission_id}")
-async def get_submission(submission_id: int, repo: FromDishka[SubmissionRepository]):
-    return await repo.get_submission_result(submission_id)
+async def get_submission(submission_id: int, show_hidden_test: bool, repo: FromDishka[SubmissionRepository]):
+    return await repo.get_submission_result(submission_id, show_hidden_test)
 
 
 @router.post("/")
