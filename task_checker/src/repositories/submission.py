@@ -1,3 +1,6 @@
+import base64
+from logging import getLogger
+
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -5,6 +8,8 @@ from persistent.models import Submission, SubmissionResult, SubmissionStatus, Ta
 from schemas import SubmissionGeneralSchema, Judge0SubmissionResultDto, SubmissionResultDto
 from schemas.submission import TestCaseResultDto
 from .base import BaseRepository
+
+logger = getLogger(__name__)
 
 
 class SubmissionRepository(BaseRepository):
@@ -47,10 +52,16 @@ class SubmissionRepository(BaseRepository):
         )
         model: SubmissionResult | None = (await self.session.execute(q)).scalar_one_or_none()  # если model = None, то это гг
 
+        try:
+            stdout = base64.b64decode(submission_result.stdout).decode("utf-8")
+        except Exception as exc:
+            logger.error(exc)
+            stdout = submission_result.stdout
+
         model.status = SubmissionStatus.from_string(submission_result.status.description)
         model.used_time = submission_result.time
         model.used_memory = submission_result.memory
-        model.stdout = submission_result.stdout
+        model.stdout = stdout
         model.stderr = submission_result.stderr
         model.compile_output = submission_result.compile_output
         model.message = submission_result.message
