@@ -1,25 +1,25 @@
 from pydantic import BaseModel
 
-from persistent.models import TestCaseType, TestCase
+from persistent.models import TaskType, TestCase
 
 
 class TaskDto(BaseModel):
     id: int
     title: str
     content: str | None
-    type: TestCaseType
+    type: TaskType
 
 
 class CreateTaskDto(BaseModel):
     title: str
     content: str | None = None
-    type: TestCaseType
+    type: TaskType
 
 
 class UpdateTaskDto(BaseModel):
     title: str | None = None
     content: str | None = None
-    type: TestCaseType | None = None
+    type: TaskType | None = None
 
 
 class TestCaseDto(BaseModel):

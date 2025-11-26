@@ -14,6 +14,7 @@ class Submission(Base, WithId, WithTimestamp):
 
     task_id: Mapped[int] = mapped_column(BIGINT, ForeignKey("tasks.id"))
     user_id: Mapped[str]
+    answer: Mapped[str]
 
     task: Mapped[Task] = relationship()
     results: Mapped[list["SubmissionResult"]] = relationship()

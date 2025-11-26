@@ -5,7 +5,7 @@ from dishka import Provider, Scope, provide
 from config import app_settings
 from persistent import Database
 from repositories import TaskRepository, TestCaseRepository, SubmissionRepository
-from services import Judge0Service
+from services import Judge0Service, SubmissionService
 
 
 class AppProvider(Provider):
@@ -41,3 +41,14 @@ class AppProvider(Provider):
     async def provide_submission_repository(self, db: Database) -> AsyncIterable[SubmissionRepository]:
         async with db.session() as session:
             yield SubmissionRepository(session)
+
+    @provide(scope=Scope.REQUEST)
+    async def provide_submission_service(
+            self, task_repo: TaskRepository,
+            testcases_repo: TestCaseRepository,
+            submission_repo: SubmissionRepository,
+            judge0_service: Judge0Service
+    ) -> SubmissionService:
+        return SubmissionService(
+            task_repo, testcases_repo, submission_repo, judge0_service
+        )

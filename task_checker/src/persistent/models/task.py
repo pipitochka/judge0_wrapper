@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from .test_case import TestCase
 
 
-class TestCaseType(enum.StrEnum):
+class TaskType(enum.StrEnum):
     Algorithm = "algorithm"
     Math = "math"
     AI_validated = "ai"
@@ -19,7 +19,7 @@ class Task(Base, WithId):
 
     title: Mapped[str]
     content: Mapped[str | None]
-    type: Mapped[TestCaseType]
+    type: Mapped[TaskType]
 
     test_cases: Mapped[list["TestCase"]] = relationship(
         back_populates="task",

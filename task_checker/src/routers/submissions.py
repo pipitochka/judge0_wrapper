@@ -1,9 +1,11 @@
 from fastapi import APIRouter, HTTPException, status
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
-from repositories import SubmissionRepository
+from persistent.models import TaskType
+from repositories import SubmissionRepository, TestCaseRepository, TaskRepository
 from services import Judge0Service
 from schemas import CreateSubmissionSchema, Judge0SubmissionResultDto
+from services.submission import SubmissionService
 
 router = APIRouter(prefix="/submissions", tags=["submissions"], route_class=DishkaRoute)
 
@@ -16,7 +18,7 @@ async def get_submission(submission_id: int, repo: FromDishka[SubmissionReposito
 @router.post("/")
 async def create_submission(
         submission: CreateSubmissionSchema,
-        judge_service: FromDishka[Judge0Service],
+        submission_service: FromDishka[SubmissionService],
         test: bool = False,
         open_tests: bool = False
 ):
@@ -25,10 +27,7 @@ async def create_submission(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"message": "Submission cannot be run wit and run on `open tests` at the same time!"}
         )
-
-    if test:
-        return await judge_service.create_test_submission(submission)
-    return await judge_service.create_submission(submission, open_tests)
+    return await submission_service.submit_solution(submission, test, open_tests)
 
 
 @router.put("/callback")

@@ -5,14 +5,14 @@ from persistent.models import Submission, SubmissionResult
 
 class CreateSubmissionSchema(BaseModel):
     task_id: int
-    source_code: str = Field(..., min_length=1, max_length=100000, description="Source code")
+    answer: str = Field(..., min_length=1, max_length=100000, description="Source code or answer")
     language_id: str
 
     stdin: str | None = Field(default=None, max_length=10000, description="stdin")
     compiler_options: str | None = Field(default=None, max_length=512, description="Compiler options")
     command_line_arguments: str | None = Field(default=None, max_length=512, description="CMD args")
 
-    @field_validator("source_code")
+    @field_validator("answer")
     def validate_source_code(cls, v):
         if len(v.strip()) == 0:
             raise ValueError("Source code cannot be empty")
@@ -73,7 +73,7 @@ class TestCaseResultDto(BaseModel):
     status: str | None
 
     used_memory: int
-    used_time: float
+    used_time: str
 
     @classmethod
     def from_sqlalchemy(
@@ -99,6 +99,7 @@ class SubmissionResultDto(BaseModel):
     id: int
     task_id: int
     status: str
+    answer: str
 
     testcase_results: list[TestCaseResultDto] = []
 
@@ -106,10 +107,12 @@ class SubmissionResultDto(BaseModel):
 class SubmissionGeneralSchema(BaseModel):
     id: int
     task_id: int
+    answer: str
 
     @classmethod
     def from_sqlalchemy(cls, data: Submission) -> "SubmissionGeneralSchema":
         return cls(
             id=data.id,
-            task_id=data.task_id
+            task_id=data.task_id,
+            answer=data.answer
         )

@@ -13,10 +13,11 @@ logger = getLogger(__name__)
 
 
 class SubmissionRepository(BaseRepository):
-    async def create_submission(self, user_id: str, task_id: int) -> SubmissionGeneralSchema:
+    async def create_submission(self, user_id: str, task_id: int, answer: str) -> SubmissionGeneralSchema:
         submission = Submission(
             task_id=task_id,
-            user_id=user_id
+            user_id=user_id,
+            answer=answer
         )
         self.session.add(submission)
         await self.session.commit()
@@ -69,6 +70,17 @@ class SubmissionRepository(BaseRepository):
         self.session.add(model)
         await self.session.commit()
 
+    async def create_non_algorithmic_submission(self, submission_id: int, testcase_id: int, passed: bool):
+        res = SubmissionResult(
+            submission_id=submission_id,
+            test_case_id=testcase_id,
+            judge0_submission_id="",
+            status=SubmissionStatus.Passed if passed else SubmissionStatus.Failed
+        )
+        self.session.add(res)
+        await self.session.commit()
+        await self.session.refresh(res)
+
     async def get_submission_result(self, submission_id: int, load_hidden_test: bool = False) -> SubmissionResultDto | None:
         q = (
             select(Submission)
@@ -118,5 +130,6 @@ class SubmissionRepository(BaseRepository):
             id=submission_id,
             status=status,
             task_id=submission.task_id,
-            testcase_results=testcase_results
+            testcase_results=testcase_results,
+            answer=submission.answer
         )

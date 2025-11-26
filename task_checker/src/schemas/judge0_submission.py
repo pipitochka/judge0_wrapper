@@ -32,17 +32,18 @@ class Judge0SubmissionSchema(BaseModel):
     @classmethod
     def from_submission_schema(cls, submission_schema: CreateSubmissionSchema):
         return Judge0SubmissionSchema(
-            source_code=submission_schema.source_code,
+            source_code=submission_schema.answer,
             language_id=submission_schema.language_id,
             stdin=submission_schema.stdin,
             compiler_options=submission_schema.compiler_options,
-            command_line_arguments=submission_schema.command_line_arguments
+            command_line_arguments=submission_schema.command_line_arguments,
+            callback_url=app_settings.get_callback_url_for_judge0()
         )
 
     @classmethod
     def from_testcase(cls, tc: TestCaseDto, submission_schema: CreateSubmissionSchema) -> "Judge0SubmissionSchema":
         return Judge0SubmissionSchema(
-            source_code=submission_schema.source_code,
+            source_code=submission_schema.answer,
             language_id=submission_schema.language_id,
             stdin=tc.stdin,
             compiler_options=submission_schema.compiler_options,

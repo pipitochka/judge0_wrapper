@@ -39,7 +39,7 @@ class Judge0Service:
                 "submissions": submissions
             }
         )
-        submission = await self._sm_repo.create_submission("0", submission.task_id)
+        submission = await self._sm_repo.create_submission("0", submission.task_id, submission.answer)
         tokens = resp.json()
 
         await self._sm_repo.create_empty_submission_results(
@@ -56,9 +56,8 @@ class Judge0Service:
         )
 
         token = resp.json()["token"]
-        print(token)
 
-        submission = await self._sm_repo.create_submission("0", 0)
+        submission = await self._sm_repo.create_submission("0", 0, submission.answer)
         await self._sm_repo.create_empty_submission_results(submission.id, [0], [token])
 
         return submission
