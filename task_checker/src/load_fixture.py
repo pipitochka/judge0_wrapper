@@ -28,17 +28,32 @@ else:
 
 
 async def load_batch(path: Path, session):
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf8") as f:
         data = json.load(f)
 
     for task in data:
         t_model = models.Task(
-            title=task["id"],
+            title=task["title"],
             content=task["description"],
             type=models.TaskType.Algorithm
         )
-        for tc in task["test_cases"]:
-            t_model.test_cases.append(models.TestCase(stdin=tc["stdin"], expected=tc["expected"]))
+        for tc in task["hidden_testcases"]:
+            t_model.test_cases.append(models.TestCase(
+                stdin=tc["input"],
+                expected=tc["output"],
+                memory_limit=task.get("memory_limit", 32) * 1024,
+                time_limit=task.get("time_limit", 2),
+                is_hidden=True
+            ))
+        for tc in task["open_testcases"]:
+            t_model.test_cases.append(models.TestCase(
+                stdin=tc["input"],
+                expected=tc["output"],
+                memory_limit=task.get("memory_limit", 32) * 1024,
+                time_limit=task.get("time_limit", 2),
+                is_hidden=False
+            ))
+
         session.add(t_model)
     await session.commit()
 
@@ -47,10 +62,10 @@ async def main():
     db = Database(db_url)
     await db.check_and_create_tables()
 
-    for i in range(num_batches):
-        async with db.session() as s:
-            await load_batch(root_dir / "fixtures" / f"problems_batch_{i + 1}.json", s)
-            print(f"Fixture {i + 1} loaded")
+    async with db.session() as s:
+        await load_batch(root_dir / "fixtures" / "dump1.json", s)
+        await load_batch(root_dir / "fixtures" / "dump2.json", s)
+        print(f"Fixtures loaded")
 
 
 asyncio.run(main())
