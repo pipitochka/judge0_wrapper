@@ -25,6 +25,6 @@ public class Task {
     @ManyToMany(mappedBy = "tasks")
     private List<User> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProblemExample> examples = new ArrayList<>();
 }
