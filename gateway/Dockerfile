@@ -1,9 +1,17 @@
-FROM openjdk:21-jdk-slim
+# === Build stage ===
+FROM gradle:8.7-jdk21 AS build
+WORKDIR /home/gradle/project
 
+COPY . .
+
+RUN gradle clean build -x test --no-daemon
+
+# === Run stage ===
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Копируем JAR файл
-COPY build/libs/gateway-1.0-SNAPSHOT.jar app.jar
+COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
 
-# Указываем точку входа
+EXPOSE 8080
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

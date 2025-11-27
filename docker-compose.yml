@@ -62,7 +62,7 @@ services:
     image: redis:7.2.4
     command: [
       "bash", "-c",
-      'docker-entrypoint.sh --appendonly no --requirepass "$$REDIS_PASSWORD"'
+      'docker-entrypoint.sh --appendonly no'
     ]
     env_file: .env
     networks: # 2. Подключаем к сети
