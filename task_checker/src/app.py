@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import uvicorn
 
-from auth import add_jwt_auth_middleware
+# from auth import add_jwt_auth_middleware
 from di import setup_di
 from persistent import Database
 from routers import add_routers

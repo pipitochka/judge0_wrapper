@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 from config import app_settings
-from .submission import CreateSubmissionSchema
+from .submission import CreateSubmissionSchema, CreateRunTestDtoSchema
 from .task import TestCaseDto
 
 
@@ -30,13 +30,13 @@ class Judge0SubmissionSchema(BaseModel):
     callback_url: str | None = None
 
     @classmethod
-    def from_submission_schema(cls, submission_schema: CreateSubmissionSchema):
+    def from_submission_schema(cls, submission_schema: CreateRunTestDtoSchema):
         return Judge0SubmissionSchema(
             source_code=submission_schema.answer,
             language_id=submission_schema.language_id,
             stdin=submission_schema.stdin,
-            compiler_options=submission_schema.compiler_options,
-            command_line_arguments=submission_schema.command_line_arguments,
+            compiler_options=None,
+            command_line_arguments=None,
             callback_url=app_settings.get_callback_url_for_judge0()
         )
 
@@ -46,8 +46,8 @@ class Judge0SubmissionSchema(BaseModel):
             source_code=submission_schema.answer,
             language_id=submission_schema.language_id,
             stdin=tc.stdin,
-            compiler_options=submission_schema.compiler_options,
-            command_line_arguments=submission_schema.command_line_arguments,
+            compiler_options=None,
+            command_line_arguments=None,
             cpu_time_limit=tc.time_limit or 2,
             memory_limit=tc.memory_limit or 128000,
             expected_output=tc.expected,

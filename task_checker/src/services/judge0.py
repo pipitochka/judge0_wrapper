@@ -5,7 +5,7 @@ import httpx
 
 from repositories import TaskRepository, TestCaseRepository, SubmissionRepository
 from schemas import SubmissionJudge0Schema, CreateSubmissionSchema, Judge0SubmissionSchema, SubmissionGeneralSchema
-
+from schemas.submission import CreateRunTestDtoSchema
 
 logger = getLogger(__name__)
 
@@ -59,7 +59,7 @@ class Judge0Service:
         )
         return submission
 
-    async def create_test_submission(self, submission: CreateSubmissionSchema) -> SubmissionGeneralSchema:
+    async def create_test_submission(self, submission: CreateRunTestDtoSchema) -> SubmissionGeneralSchema:
         resp = await self._client.post(
             f"{self._url}/submissions",
             json=dict(Judge0SubmissionSchema.from_submission_schema(submission))
